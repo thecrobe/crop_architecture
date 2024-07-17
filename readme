@@ -1,0 +1,12 @@
+# XXX Analysis Repository
+
+This repository contains the code and data necessary to reproduce the results of XXX.
+
+## Repository Structure
+
+- **code/**: Contains scripts organized by analysis.
+- **data/**: Contains the datasets used in the analyses.
+
+## Important Notes
+
+- The models are computationally intensive and would benefit from running on a server with parallel processing capabilities.
