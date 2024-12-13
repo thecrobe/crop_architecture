@@ -1,0 +1,64 @@
+"Trait","State","Before","Proportion"
+"Growthdirection","Before","ageotropic",10.2040816326531
+"Growthdirection","Before","axis 1 - orthotropic axis 2 - plagiotropic",12.2448979591837
+"Growthdirection","Before","axis 1 - orthotropic axis 2 - plagiotropic and orthotropic",2.04081632653061
+"Growthdirection","Before","orthotropic",59.1836734693878
+"Growthdirection","Before","plagiotropic",16.3265306122449
+"Growthdirection","After","ageotropic",26.530612244898
+"Growthdirection","After","axis 1 - orthotropic axis 2 - plagiotropic",10.2040816326531
+"Growthdirection","After","axis 1 orthotropic and plagiotropic",2.04081632653061
+"Growthdirection","After","orthotropic",36.734693877551
+"Growthdirection","After","plagiotropic",24.4897959183673
+"Phyllotaxis","Before","axis 1 - spiral axis 2 - distichous",1.58730158730159
+"Phyllotaxis","Before","distichous",17.4603174603175
+"Phyllotaxis","Before","opposite",15.8730158730159
+"Phyllotaxis","Before","opposite/spiral",6.34920634920635
+"Phyllotaxis","Before","spiral",55.5555555555556
+"Phyllotaxis","Before","spiral and distichous",3.17460317460317
+"Phyllotaxis","After","axis 1 - spiral axis 2 - distichous",4.76190476190476
+"Phyllotaxis","After","distichous",25.3968253968254
+"Phyllotaxis","After","opposite",22.2222222222222
+"Phyllotaxis","After","opposite/spiral",3.17460317460317
+"Phyllotaxis","After","spiral",39.6825396825397
+"Phyllotaxis","After","spiral and distichous",4.76190476190476
+"BranchingType","Before","absent",6.66666666666667
+"BranchingType","Before","axis 1 - monopodial axis 2 - sympodial",6.66666666666667
+"BranchingType","Before","monopodial",51.1111111111111
+"BranchingType","Before","sympodial",35.5555555555556
+"BranchingType","After","absent",6.66666666666667
+"BranchingType","After","monopodial",44.4444444444444
+"BranchingType","After","monopodial and sympodial",2.22222222222222
+"BranchingType","After","sympodial",46.6666666666667
+"BranchingPosition","Before","absent",5.05050505050505
+"BranchingPosition","Before","acrotonic",13.1313131313131
+"BranchingPosition","Before","acrotonic and basitonic",3.03030303030303
+"BranchingPosition","Before","acrotonic and mesotonic",8.08080808080808
+"BranchingPosition","Before","basitonic",26.2626262626263
+"BranchingPosition","Before","basitonic and mesotonic",7.07070707070707
+"BranchingPosition","Before","mesotonic",37.3737373737374
+"BranchingPosition","After","absent",5.05050505050505
+"BranchingPosition","After","acrotonic",9.09090909090909
+"BranchingPosition","After","acrotonic and basitonic",3.03030303030303
+"BranchingPosition","After","acrotonic and mesotonic",1.01010101010101
+"BranchingPosition","After","basitonic",26.2626262626263
+"BranchingPosition","After","basitonic and mesotonic",21.2121212121212
+"BranchingPosition","After","mesotonic",34.3434343434343
+"FloweringAxis","Before","lateral",51.1627906976744
+"FloweringAxis","Before","lateral and terminal",18.6046511627907
+"FloweringAxis","Before","terminal",30.2325581395349
+"FloweringAxis","After","lateral",23.2558139534884
+"FloweringAxis","After","lateral and terminal",18.6046511627907
+"FloweringAxis","After","lateral or terminal",4.65116279069767
+"FloweringAxis","After","terminal",53.4883720930233
+"MeristemFunction","Before","determinate",35.8974358974359
+"MeristemFunction","Before","indeterminate",64.1025641025641
+"MeristemFunction","After","determinate",64.1025641025641
+"MeristemFunction","After","indeterminate",35.8974358974359
+"BranchingMechanism","Before","absent",5.88235294117647
+"BranchingMechanism","Before","continuous",47.0588235294118
+"BranchingMechanism","Before","diffuse",5.88235294117647
+"BranchingMechanism","Before","rhythmic",41.1764705882353
+"BranchingMechanism","After","absent",8.82352941176471
+"BranchingMechanism","After","continuous",41.1764705882353
+"BranchingMechanism","After","diffuse",8.82352941176471
+"BranchingMechanism","After","rhythmic",41.1764705882353
