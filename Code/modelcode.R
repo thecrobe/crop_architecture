@@ -27,7 +27,7 @@ trait<-trait %>%
     TRUE ~ Herbaceous.woody  # keeps all other values the same
   ))
 # IS TIP OR BASE THE RIGHT TREE TO USE? MODEL COEFFICIENTS ARE SIMILAR EITHER WAY, BUT NOT SURE WHAT ORIGINAL ANALYSIS USED
-tree<-ape::read.tree("~/Dropbox/other_projects/crop_architecture/crop_architecture/Trees/tree_pgls_tip_clean.tre")
+tree<-ape::read.tree("~/Dropbox/other_projects/crop_architecture/crop_architecture/Output/tree_pgls_base_clean.tre")
 
 ###### GrowthDirection Model #####
 GrowthDirection <- trait %>% filter(Trait == "GrowthDirection", VALUE != "NoData")
@@ -59,9 +59,11 @@ woody_GrowthDirection <- brm(bf(y |trials(size) ~ 1 + (1|gr(Tree,cov=B))),
                              iter = 3000,
                              warmup = 500,
                              sample_prior = TRUE,
-                             cores = 4)
+                             cores = 4,
+                             control = list(adapt_delta=0.85))
 print(woody_GrowthDirection)
 saveRDS(woody_GrowthDirection, file = "~/Dropbox/other_projects/crop_architecture/woody_GrowthDirection.RDS")
+# woody_GrowthDirection <- readRDS("../woody_GrowthDirection.RDS")
 
 #Repeat steps above for herbaceous plans
 herb<-data %>% filter(wild.cultivated == "Cultivated" & Herbaceous.woody == "Herbaceous")
@@ -80,6 +82,7 @@ herb_GrowthDirection <- brm(bf(y |trials(size) ~ 1 + (1|gr(Tree,cov=B))),
                             cores = 4)
 print(herb_GrowthDirection)
 saveRDS(herb_GrowthDirection, file = "~/Dropbox/other_projects/crop_architecture/herb_GrowthDirection.RDS")
+# herb_GrowthDirection <- readRDS("../herb_GrowthDirection.RDS")
 
 # Extract posterior distributions from the Models_tip,
 # ps_woody <- posterior_samples(woody_GrowthDirection)[,1:3]
@@ -121,9 +124,9 @@ dfm_herb <- df_herb %>%  # organize for plotting
 
 ##### Hypothesis testing 
 dat1 <- as.data.frame(woody_GrowthDirection)
-hypothesis(dat1, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
+h_woody_GrowthDirection <- hypothesis(dat1, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
 dat2 <- as.data.frame(herb_GrowthDirection)
-hypothesis(dat2, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
+h_herb_GrowthDirection <- hypothesis(dat2, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
 
 # Plot
 df_plot<-rbind(dfm_woody,dfm_herb) 
@@ -171,9 +174,11 @@ woody_Phyllotaxis <- brm(bf(y |trials(size) ~ 1 + (1|gr(Tree,cov=B))),
                          iter = 3000,
                          warmup = 500,
                          sample_prior = TRUE,
-                         cores = 4)
+                         cores = 4,
+                         control = list(adapt_delta=0.95))
 print(woody_Phyllotaxis)
 saveRDS(woody_Phyllotaxis, file = "~/Dropbox/other_projects/crop_architecture/woody_Phyllotaxis.RDS")
+# woody_Phyllotaxis <- readRDS("../woody_Phyllotaxis.RDS")
 
 #Repeat steps above for herbaceous plans
 herb<-data %>% filter(wild.cultivated == "Cultivated" & Herbaceous.woody == "Herbaceous")
@@ -189,9 +194,11 @@ herb_Phyllotaxis <- brm(bf(y |trials(size) ~ 1 + (1|gr(Tree,cov=B))),
                         iter = 3000,
                         warmup = 500,
                         sample_prior = TRUE,
-                        cores = 4)
+                        cores = 4,
+                        control = list(adapt_delta = 0.95))
 print(herb_Phyllotaxis)
 saveRDS(herb_Phyllotaxis, file = "~/Dropbox/other_projects/crop_architecture/herb_Phyllotaxis.RDS")
+# herb_Phyllotaxis <- readRDS("../herb_Phyllotaxis.RDS")
 
 # Extract posterior distributions from the Models_tip,
 ps_woody <- as_draws_df(woody_Phyllotaxis,
@@ -231,10 +238,10 @@ dfm_herb <- df_herb %>%  # organize for plotting
 
 ##### Hypothesis testing 
 dat1 <- as.data.frame(woody_Phyllotaxis)
-hypothesis(dat1, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
+h_woody_Phyllotaxis <- hypothesis(dat1, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
 
 dat2 <- as.data.frame(herb_Phyllotaxis)
-hypothesis(dat2, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
+h_herb_Phyllotaxis <- hypothesis(dat2, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
 
 # Plot
 df_plot<-rbind(dfm_woody,dfm_herb) 
@@ -271,38 +278,40 @@ woody$size <- with(woody,WR2toCrop+WR2toWR1+Both+Neither)
 woody$y <- with(woody, cbind(Neither,Both,WR2toCrop,WR2toWR1)) 
 #Run model
 
-# woody_BranchingType <- brm(bf(y |trials(size) ~ 1 + (1|gr(Tree,cov=B))),
-#                            family = multinomial(),
-#                            data = data.frame(woody)
-#                            ,data2 = list(B=B),
-#                            chains = 4,
-#                            thin = 5,
-#                            iter = 3000,
-#                            warmup = 500,
-#                            sample_prior = TRUE,
-#                            cores = 4)
-woody_BranchingType <- readRDS("../woody_BranchingType.RDS")
+woody_BranchingType <- brm(bf(y |trials(size) ~ 1 + (1|gr(Tree,cov=B))),
+                           family = multinomial(),
+                           data = data.frame(woody)
+                           ,data2 = list(B=B),
+                           chains = 4,
+                           thin = 5,
+                           iter = 3000,
+                           warmup = 500,
+                           sample_prior = TRUE,
+                           cores = 4,
+                           control = list(adapt_delta = 0.85))
 print(woody_BranchingType)
-# saveRDS(woody_BranchingType, file = "~/Dropbox/other_projects/crop_architecture/woody_BranchingType.RDS")
+saveRDS(woody_BranchingType, file = "~/Dropbox/other_projects/crop_architecture/woody_BranchingType.RDS")
+# woody_BranchingType <- readRDS("../woody_BranchingType.RDS")
 
 #Repeat steps above for herbaceous plans
 herb<-data %>% filter(wild.cultivated == "Cultivated" & Herbaceous.woody == "Herbaceous")
 herb$size <- with(herb,WR2toCrop+WR2toWR1+Both+Neither)
 herb$y <- with(herb, cbind(Neither,Both,WR2toCrop,WR2toWR1))
 
-# herb_BranchingType <- brm(bf(y |trials(size) ~ 1 + (1|gr(Tree,cov=B))),
-#                           family = multinomial(),
-#                           data = data.frame(herb),
-#                           data2 = list(B=B),
-#                           chains = 4,
-#                           thin = 5,
-#                           iter = 3000,
-#                           warmup = 500,
-#                           sample_prior = TRUE,
-#                           cores = 4)
-herb_BranchingType <- readRDS("../herb_BranchingType.RDS")
+herb_BranchingType <- brm(bf(y |trials(size) ~ 1 + (1|gr(Tree,cov=B))),
+                          family = multinomial(),
+                          data = data.frame(herb),
+                          data2 = list(B=B),
+                          chains = 4,
+                          thin = 5,
+                          iter = 3000,
+                          warmup = 500,
+                          sample_prior = TRUE,
+                          cores = 4,
+                          control = list(adapt_delta = 0.9))
 print(herb_BranchingType)
-# saveRDS(herb_BranchingType, file = "~/Dropbox/other_projects/crop_architecture/herb_BranchingType.RDS")
+saveRDS(herb_BranchingType, file = "~/Dropbox/other_projects/crop_architecture/herb_BranchingType.RDS")
+# herb_BranchingType <- readRDS("../herb_BranchingType.RDS")
 
 # Extract posterior distributions from the Models_tip,
 ps_woody <- as_draws_df(woody_BranchingType,
@@ -342,10 +351,10 @@ dfm_herb <- df_herb %>%  # organize for plotting
 
 ##### Hypothesis testing 
 dat1 <- as.data.frame(woody_BranchingType)
-hypothesis(dat1, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
+h_woody_BranchingType <- hypothesis(dat1, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
 
 dat2 <- as.data.frame(herb_BranchingType)
-hypothesis(dat2, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
+h_herb_BranchingType <- hypothesis(dat2, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
 
 # Plot
 df_plot<-rbind(dfm_woody,dfm_herb) 
@@ -383,38 +392,40 @@ woody$size <- with(woody,WR2toCrop+WR2toWR1+Both+Neither)
 woody$y <- with(woody, cbind(Neither,Both,WR2toCrop,WR2toWR1)) 
 #Run model
 
-# woody_BranchingPosition <- brm(bf(y |trials(size) ~ 1 + (1|gr(Tree,cov=B))),
-#                                family = multinomial(),
-#                                data = data.frame(woody)
-#                                ,data2 = list(B=B),
-#                                chains = 4,
-#                                thin = 5,
-#                                iter = 3000,
-#                                warmup = 500,
-#                                sample_prior = TRUE,
-#                                cores = 4)
-woody_BranchingPosition <- readRDS("../woody_BranchingPosition.RDS")
+woody_BranchingPosition <- brm(bf(y |trials(size) ~ 1 + (1|gr(Tree,cov=B))),
+                               family = multinomial(),
+                               data = data.frame(woody)
+                               ,data2 = list(B=B),
+                               chains = 4,
+                               thin = 5,
+                               iter = 3000,
+                               warmup = 500,
+                               sample_prior = TRUE,
+                               cores = 4)
+
 print(woody_BranchingPosition)
-# saveRDS(woody_BranchingPosition, file = "~/Dropbox/other_projects/crop_architecture/woody_BranchingPosition.RDS")
+saveRDS(woody_BranchingPosition, file = "~/Dropbox/other_projects/crop_architecture/woody_BranchingPosition.RDS")
+# woody_BranchingPosition <- readRDS("../woody_BranchingPosition.RDS")
 
 #Repeat steps above for herbaceous plans
 herb<-data %>% filter(wild.cultivated == "Cultivated" & Herbaceous.woody == "Herbaceous")
 herb$size <- with(herb,WR2toCrop+WR2toWR1+Both+Neither)
 herb$y <- with(herb, cbind(Neither,Both,WR2toCrop,WR2toWR1))
 
-# herb_BranchingPosition <- brm(bf(y |trials(size) ~ 1 + (1|gr(Tree,cov=B))),
-#                               family = multinomial(),
-#                               data = data.frame(herb),
-#                               data2 = list(B=B),
-#                               chains = 4,
-#                               thin = 5,
-#                               iter = 3000,
-#                               warmup = 500,
-#                               sample_prior = TRUE,
-#                               cores = 4)
-herb_BranchingPosition <- readRDS("../herb_BranchingPosition.RDS")
+herb_BranchingPosition <- brm(bf(y |trials(size) ~ 1 + (1|gr(Tree,cov=B))),
+                              family = multinomial(),
+                              data = data.frame(herb),
+                              data2 = list(B=B),
+                              chains = 4,
+                              thin = 5,
+                              iter = 3000,
+                              warmup = 500,
+                              sample_prior = TRUE,
+                              cores = 4)
+
 print(herb_BranchingPosition)
-# saveRDS(herb_BranchingPosition, file = "~/Dropbox/other_projects/crop_architecture/herb_BranchingPosition.RDS")
+saveRDS(herb_BranchingPosition, file = "~/Dropbox/other_projects/crop_architecture/herb_BranchingPosition.RDS")
+# herb_BranchingPosition <- readRDS("../herb_BranchingPosition.RDS")
 
 # Extract posterior distributions from the Models_tip,
 ps_woody <- as_draws_df(woody_BranchingPosition,
@@ -457,10 +468,10 @@ x<-dfm_herb  %>% filter(variable == "Crop")
 mean(x$value)
 ##### Hypothesis testing 
 dat1 <- as.data.frame(woody_BranchingPosition)
-hypothesis(dat1, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
+h_woody_BranchingPosition <- hypothesis(dat1, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
 
 dat2 <- as.data.frame(herb_BranchingPosition)
-hypothesis(dat2, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
+h_herb_BranchingPosition <- hypothesis(dat2, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
 
 # Plot
 df_plot<-rbind(dfm_woody,dfm_herb) 
@@ -487,7 +498,7 @@ d<-dplyr::inner_join(labels, Flowering)
 data<-d %>% filter(d$wild.cultivated == "Cultivated")
 
 #Prepare tree for model 
-A <- ape::vcv.phylo(FloweringAxis_tree)
+A <- ape::vcv.phylo(Flowering_tree)
 B <-diag(diag(A + 0.00000000000000001)) #add to diagonal to make matrix positive definite.
 row.names(B)<-row.names(A)
 
@@ -507,9 +518,11 @@ woody_Flowering <- brm(bf(y |trials(size) ~ 1 + (1|gr(Tree,cov=B))),
                            iter = 3000,
                            warmup = 500,
                            sample_prior = TRUE,
-                           cores = 4)
+                           cores = 4,
+                       control = list(adapt_delta=0.85))
 print(woody_Flowering)
 saveRDS(woody_Flowering, file = "~/Dropbox/other_projects/crop_architecture/woody_Flowering.RDS")
+# woody_Flowering <- readRDS("../woody_Flowering.RDS")
 
 #Repeat steps above for herbaceous plans
 herb<-data %>% filter(wild.cultivated == "Cultivated" & Herbaceous.woody == "Herbaceous")
@@ -517,17 +530,20 @@ herb$size <- with(herb,WR2toCrop+WR2toWR1+Both+Neither)
 herb$y <- with(herb, cbind(Neither,Both,WR2toCrop,WR2toWR1))
 
 herb_Flowering <- brm(bf(y |trials(size) ~ 1 + (1|gr(Tree,cov=B))),
-                          family = multinomial(),
-                          data = data.frame(herb),
-                          data2 = list(B=B),
-                          chains = 4,
-                          thin = 5,
-                          iter = 3000,
-                          warmup = 500,
-                          sample_prior = TRUE,
-                          cores = 4)
+                      family = multinomial(),
+                      data = data.frame(herb),
+                      data2 = list(B=B),
+                      chains = 4,
+                      thin = 5,
+                      iter = 3000,
+                      warmup = 500,
+                      sample_prior = TRUE,
+                      cores = 4,
+                      control = list(adapt_delta=0.95)
+                      )
 print(herb_Flowering)
 saveRDS(herb_Flowering, file = "~/Dropbox/other_projects/crop_architecture/herb_Flowering.RDS")
+# herb_Flowering <- readRDS("../herb_Flowering.RDS")
 
 # Extract posterior distributions from the Models_tip,
 ps_woody <- as_draws_df(woody_Flowering,
@@ -567,10 +583,10 @@ dfm_herb <- df_herb %>%  # organize for plotting
 
 ##### Hypothesis testing 
 dat1 <- as.data.frame(woody_Flowering)
-hypothesis(dat1, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
+h_woody_Flowering <- hypothesis(dat1, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
 
 dat2 <- as.data.frame(herb_Flowering)
-hypothesis(dat2, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
+h_herb_Flowering <- hypothesis(dat2, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
 
 # Plot
 df_plot<-rbind(dfm_woody,dfm_herb) 
@@ -616,9 +632,11 @@ woody_MeristemFunction <- brm(bf(y |trials(size) ~ 1 + (1|gr(Tree,cov=B))),
                               iter = 3000,
                               warmup = 500,
                               sample_prior = TRUE,
-                              cores = 4)
+                              cores = 4,
+                              control = list(adapt_delta=0.85))
 print(woody_MeristemFunction)
 saveRDS(woody_MeristemFunction, file = "~/Dropbox/other_projects/crop_architecture/woody_MeristemFunction.RDS")
+# woody_MeristemFunction <- readRDS("../woody_MeristemFunction.RDS")
 
 #Repeat steps above for herbaceous plans
 herb<-data %>% filter(wild.cultivated == "Cultivated" & Herbaceous.woody == "Herbaceous")
@@ -634,9 +652,11 @@ herb_MeristemFunction <- brm(bf(y |trials(size) ~ 1 + (1|gr(Tree,cov=B))),
                              iter = 3000,
                              warmup = 500,
                              sample_prior = TRUE,
-                             cores = 4)
+                             cores = 4,
+                             control = list(adapt_delta = 0.9))
 print(herb_MeristemFunction)
 saveRDS(herb_MeristemFunction, file = "~/Dropbox/other_projects/crop_architecture/herb_MeristemFunction.RDS")
+# herb_MeristemFunction <- readRDS("../herb_MeristemFunction.RDS")
 
 # Extract posterior distributions from the Models_tip,
 ps_woody <- as_draws_df(woody_MeristemFunction,
@@ -676,10 +696,10 @@ dfm_herb <- df_herb %>%  # organize for plotting
 
 ##### Hypothesis testing 
 dat1 <- as.data.frame(woody_MeristemFunction)
-hypothesis(dat1, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
+h_woody_MeristemFunction <- hypothesis(dat1, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
 
 dat2 <- as.data.frame(herb_MeristemFunction)
-hypothesis(dat2, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
+h_herb_MeristemFunction <- hypothesis(dat2, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
 
 # Plot
 df_plot<-rbind(dfm_woody,dfm_herb) 
@@ -725,9 +745,11 @@ woody_BranchingMechanism <- brm(bf(y |trials(size) ~ 1 + (1|gr(Tree,cov=B))),
                                 iter = 3000,
                                 warmup = 500,
                                 sample_prior = TRUE,
-                                cores = 4)
+                                cores = 4,
+                                control = list(adapt_delta = 0.85))
 print(woody_BranchingMechanism)
 saveRDS(woody_BranchingMechanism, file = "~/Dropbox/other_projects/crop_architecture/woody_BranchingMechanism.RDS")
+# woody_BranchingMechanism <- readRDS("../woody_BranchingMechanism.RDS")
 
 #Repeat steps above for herbaceous plans
 herb<-data %>% filter(wild.cultivated == "Cultivated" & Herbaceous.woody == "Herbaceous")
@@ -743,9 +765,12 @@ herb_BranchingMechanism <- brm(bf(y |trials(size) ~ 1 + (1|gr(Tree,cov=B))),
                                iter = 3000,
                                warmup = 500,
                                sample_prior = TRUE,
-                               cores = 4)
+                               cores = 4,
+                               control = list(adapt_delta = 0.95)
+                               )
 print(herb_BranchingMechanism)
 saveRDS(herb_BranchingMechanism, file = "~/Dropbox/other_projects/crop_architecture/herb_BranchingMechanism.RDS")
+# herb_BranchingMechanism <- readRDS("../herb_BranchingMechanism.RDS")
 
 # Extract posterior distributions from the Models_tip,
 ps_woody <- as_draws_df(woody_BranchingMechanism,
@@ -785,10 +810,10 @@ dfm_herb <- df_herb %>%  # organize for plotting
 
 ##### Hypothesis testing 
 dat1 <- as.data.frame(woody_BranchingMechanism)
-hypothesis(dat1, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
+h_woody_BranchingMechanism <- hypothesis(dat1, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
 
 dat2 <- as.data.frame(herb_BranchingMechanism)
-hypothesis(dat2, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
+h_herb_BranchingMechanism <- hypothesis(dat2, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
 
 # Plot
 df_plot<-rbind(dfm_woody,dfm_herb) 
@@ -835,9 +860,11 @@ woody_ShortShoots <- brm(bf(y |trials(size) ~ 1 + (1|gr(Tree,cov=B))),
                          iter = 3000,
                          warmup = 500,
                          sample_prior = TRUE,
-                         cores = 4)
+                         cores = 4,
+                         control = list(adapt_delta = 0.9))
 print(woody_ShortShoots)
 saveRDS(woody_ShortShoots, file = "~/Dropbox/other_projects/crop_architecture/woody_ShortShoots.RDS")
+# woody_ShortShoots <- readRDS("../woody_ShortShoots.RDS")
 
 #Repeat steps above for herbaceous plans
 herb<-data %>% filter(wild.cultivated == "Cultivated" & Herbaceous.woody == "Herbaceous")
@@ -853,9 +880,11 @@ herb_ShortShoots <- brm(bf(y |trials(size) ~ 1 + (1|gr(Tree,cov=B))),
                         iter = 3000,
                         warmup = 500,
                         sample_prior = TRUE,
-                        cores = 4)
+                        cores = 4,
+                        control = list(adapt_delta = 0.9))
 print(herb_ShortShoots)
 saveRDS(herb_ShortShoots, file = "~/Dropbox/other_projects/crop_architecture/herb_ShortShoots.RDS")
+# herb_ShortShoots <- readRDS("../herb_ShortShoots.RDS")
 
 # Extract posterior distributions from the Models_tip,
 ps_woody <- as_draws_df(woody_ShortShoots,
@@ -895,17 +924,17 @@ dfm_herb <- df_herb %>%  # organize for plotting
 
 ##### Hypothesis testing
 dat1 <- as.data.frame(woody_ShortShoots)
-hypothesis(dat1, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
+h_woody_ShortShoots <- hypothesis(dat1, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
 
 dat2 <- as.data.frame(herb_ShortShoots)
-hypothesis(dat2, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
+h_herb_ShortShoots <- hypothesis(dat2, "b_muWR2toCrop_Intercept > b_muWR2toWR1_Intercept")
 
 # Plot
 df_plot<-rbind(dfm_woody,dfm_herb)
 estimates_ShortShoots<-df_plot
 
-phylo_plot<-ggplot(df_plot, aes(x=log10(value*100),y=form,fill=variable)) +
-  stat_slab(adjust = 10) +
+phylo_plot<-ggplot(df_plot, aes(x=value*100,y=form,fill=variable)) +
+  stat_slabinterval() +
   theme_bw() +
   xlab("Probability of change (%)") +
   ylab("Density") +
@@ -923,9 +952,29 @@ estimates<-rbind(estimates_GrowthDirection,estimates_Phyllotaxis,
   mutate(form = ifelse(form == "herb", "Herbaceous", form)) %>%
   mutate(form = ifelse(form == "woody", "Woody", form))
 
-
 d<-data.frame(estimates_Phyllotaxis  %>% filter(form=="herb"))
 sd(d$value)
+
+p.values <- c(h_woody_GrowthDirection$hypothesis$Post.Prob, h_herb_GrowthDirection$hypothesis$Post.Prob,
+              h_woody_Phyllotaxis$hypothesis$Post.Prob, h_herb_Phyllotaxis$hypothesis$Post.Prob,
+              h_woody_BranchingType$hypothesis$Post.Prob, h_herb_BranchingType$hypothesis$Post.Prob,
+              h_woody_BranchingPosition$hypothesis$Post.Prob, h_herb_BranchingPosition$hypothesis$Post.Prob,
+              h_woody_Flowering$hypothesis$Post.Prob, h_herb_Flowering$hypothesis$Post.Prob,
+              h_woody_MeristemFunction$hypothesis$Post.Prob, h_herb_MeristemFunction$hypothesis$Post.Prob,
+              h_woody_BranchingMechanism$hypothesis$Post.Prob, h_herb_BranchingMechanism$hypothesis$Post.Prob,
+              h_woody_ShortShoots$hypothesis$Post.Prob, h_herb_ShortShoots$hypothesis$Post.Prob)
+
+p.values <- data.frame(Trait = c(rep("Growth Direction", 2),
+                                 rep("Phyllotaxis", 2),
+                                 rep("Branching Type", 2),
+                                 rep("Branching Position", 2),
+                                 rep("Flowering Axis", 2),
+                                 rep("Meristem Function", 2),
+                                 rep("Branching Mechanism", 2),
+                                 rep("Short Shoots", 2)),
+                       form = rep(c("Woody", "Herbaceous"), 8),
+                       p = p.values
+                       )
 
 groups <- unique(estimates$Trait) # get a list of unique groups
 plot_list <- list() # initialize empty list to store plots
@@ -933,16 +982,41 @@ plot_list <- list() # initialize empty list to store plots
 for (g in groups) {
   # create a ggplot for the current group
   plot_data <- estimates[estimates$Trait == g, ]
-  p <- ggplot(plot_data, aes(x=value*100,y=form, fill=variable))  +
-    stat_slab(color="black",size=0.3) + 
-    scale_fill_nejm() + 
-    ggtitle(label = g) +
-    ggsci::scale_fill_aaas(name="Contrast") + 
-    xlab("Probability (%)") + 
+  ps <- p.values[p.values$Trait == g, ]$p
+  ps <- signif(ps*100, 2)
+  if (g %in% c("Branching Position", "Phyllotaxis")) {
+    p <- ggplot(plot_data, aes(x=value*100,y=form, fill=variable)) +
+      stat_slabinterval() +
+      ggsci::scale_fill_aaas(name="Direction") + 
+      ggsci::scale_color_aaas(name="Direction") +
+      labs(title = g,
+           subtitle = paste0("P woody = ", ps[1], "% | ", "P herb = ", ps[2], "%"),
+             x = "Probability of change (%)") +
+      theme_bw() +
+      theme(plot.title = element_text(size=12),
+            axis.title.y = element_blank(),
+            plot.subtitle = element_text(size=10))
     
-    ylab("") + theme_bw()
-  # save the ggplot in the list
-  plot_list[[g]] <- p
+    # save the ggplot in the list
+    plot_list[[g]] <- p
+  } else {
+    p <- ggplot(plot_data, aes(x=value*100,y=form, fill=variable)) +
+      stat_slabinterval() +
+      ggsci::scale_fill_aaas(name="Direction") + 
+      ggsci::scale_color_aaas(name="Direction") +
+      labs(title = g,
+           subtitle = paste0("P woody = ", ps[1], "% | ", "P herb = ", ps[2], "%"),
+             x = "Probability of change (%)") +
+      theme_bw() +
+      theme(axis.text.y = element_blank(),
+            axis.title.y = element_blank(),
+            plot.title = element_text(size=12),
+            plot.subtitle = element_text(size=10))
+    
+    # save the ggplot in the list
+    plot_list[[g]] <- p
+  }
+  
 }
 
 # print the ggplots from the list
@@ -953,9 +1027,11 @@ for (i in seq_along(plot_list)) {
 ordered_list<-list(plot_list$`Branching Position`,plot_list$`Growth Direction`,
                    plot_list$`Branching Mechanism`,plot_list$`Flowering Axis`,
                    plot_list$Phyllotaxis,plot_list$`Meristem Function`,
-                   plot_list$`Branching Type`,plot_list$`Short Shoots`)
+                   plot_list$`Branching Type`,plot_list$`Short Shoots`
+                   )
 
-ggarrange(plotlist = ordered_list,ncol = 4,nrow = 2,common.legend = TRUE)
+ggarrange(plotlist = ordered_list,ncol = 4,nrow = 2,common.legend = TRUE,
+          legend="right", widths = c(1.25,1,1,1))
 
 
 
@@ -973,53 +1049,3 @@ ggplot(results, aes(x=Form, y=Trait, fill=value)) +
   theme_bw() 
 
 summary(results$value)
-
-###### SPECIFIC END-STATE MODELS ######
-
-# c<-trait.new %>% filter(wild.cultivated =="Cultivated")
-# length(unique(c$Tree))
-# 
-# trait.new$WR2toCrop<-as.numeric(trait.new$WR2toCrop)
-# trait.new$WR2toWR1<-as.numeric(trait.new$WR2toWR1)
-# trait.new$Both<-as.numeric(trait.new$Both)
-# trait.new$Neither<-as.numeric(trait.new$Neither)
-# trait.new$Herbaceous.woody<-trait.new$Herbaceous.woody_1
-# 
-# trait.new<-trait.new %>%
-#   mutate(Herbaceous.woody = case_when(
-#     Herbaceous.woody == "Graminoid" ~ "Herbaceous",
-#     TRUE ~ Herbaceous.woody  # keeps all other values the same
-#   ))
-# tree<-ape::read.tree("~/Dropbox/other_projects/crop_architecture/crop_architecture/Trees/tree_pgls_base_clean.tre")
-
-###### GrowthDirection Model #####
-GrowthDirection<-trait %>% filter(Trait == "Growthdirection" & VALUE != "NoData")
-GrowthDirection_drop<-trait %>% filter(Trait == "Growthdirection", VALUE == "NoData")
-GrowthDirection_tree<-drop.tip(tree, GrowthDirection_drop$Tree)
-labels<-data.frame(TipLabels(GrowthDirection_tree)) 
-labels$Tree<-labels$TipLabels.GrowthDirection_tree.
-d<-dplyr::inner_join(labels, GrowthDirection)
-data<-d %>% filter(d$wild.cultivated == "Cultivated")
-722#Prepare tree for model 
-A <- ape::vcv.phylo(GrowthDirection_tree)
-B <-diag(diag(A + 0.00000000000000001)) #add to diagonal to make matrix positive definite.
-row.names(B)<-row.names(A)
-
-unique_traits <- unique(cultivation.new$Trait)
-
-# Initialize a list to store the combined data for each trait
-all_traits_data <- list()
-
-# Loop through each trait
-for (trait in unique_traits) {
-  # Filter data for the current trait where conditions are met
-  test <- cultivation.new %>%
-    filter(Trait == trait) %>%
-    filter(WR2toCrop == 1 & WR2toWR1 == 0) %>%
-    dplyr::select(Direction.WR2.to.Crop) %>%
-    filter(!is.na(Direction.WR2.to.Crop), Direction.WR2.to.Crop != "") %>%
-    # Handle rows that do not split correctly
-    separate(Direction.WR2.to.Crop, into = c("Before", "After"), sep = " to ", extra = "drop", fill = "right") %>%
-    # Drop rows where 'Before' or 'After' is NA
-    filter(!is.na(Before), !is.na(After))
-  
