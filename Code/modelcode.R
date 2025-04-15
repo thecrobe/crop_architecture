@@ -28,11 +28,11 @@ trait<-trait %>%
   ))
 # IS TIP OR BASE THE RIGHT TREE TO USE? MODEL COEFFICIENTS ARE SIMILAR EITHER WAY, BUT NOT SURE WHAT ORIGINAL ANALYSIS USED
 tree<-ape::read.tree("~/Dropbox/other_projects/crop_architecture/crop_architecture/Output/tree_pgls_base_clean.tre")
+trait$Tree <- trait$Species.ssp.var
 
 ###### GrowthDirection Model #####
 GrowthDirection <- trait %>% filter(Trait == "GrowthDirection", VALUE != "NoData")
-GrowthDirection$Tree <- GrowthDirection$Species.ssp.var
-GrowthDirection_drop<-trait %>% filter(Trait == "Growthdirection", VALUE == "NoData")
+GrowthDirection_drop<-trait %>% filter(Trait == "GrowthDirection", VALUE == "NoData")
 GrowthDirection_tree<-drop.tip(tree, GrowthDirection_drop$Tree)
 labels<-data.frame(TipLabels(GrowthDirection_tree)) 
 labels$Tree<-labels$TipLabels.GrowthDirection_tree.
@@ -145,7 +145,6 @@ phylo_plot
 
 ###### Phyllotaxis Model #####
 Phyllotaxis<-trait %>% filter(Trait == "Phyllotaxis" & VALUE != "NoData")
-Phyllotaxis$Tree <- Phyllotaxis$Species.ssp.var
 Phyllotaxis_drop<-trait %>% filter(Trait == "Phyllotaxis", VALUE == "NoData")
 Phyllotaxis_tree<-drop.tip(tree, Phyllotaxis_drop$Tree)
 labels<-data.frame(TipLabels(Phyllotaxis_tree)) 
@@ -258,7 +257,6 @@ phylo_plot
 
 ###### BranchingType Model #####
 BranchingType<-trait %>% filter(Trait == "BranchingType" & VALUE != "NoData")
-BranchingType$Tree <- BranchingType$Species.ssp.var
 BranchingType_drop<-trait %>% filter(Trait == "BranchingType", VALUE == "NoData")
 BranchingType_tree<-drop.tip(tree, BranchingType_drop$Tree)
 labels<-data.frame(TipLabels(BranchingType_tree)) 
@@ -372,7 +370,6 @@ phylo_plot
 
 ###### BranchingPosition Model #####
 BranchingPosition<-trait %>% filter(Trait == "BranchingPosition" & VALUE != "NoData")
-BranchingPosition$Tree <- BranchingPosition$Species.ssp.var
 BranchingPosition_drop<-trait %>% filter(Trait == "BranchingPosition", VALUE == "NoData")
 BranchingPosition_tree<-drop.tip(tree, BranchingPosition_drop$Tree)
 labels<-data.frame(TipLabels(BranchingPosition_tree)) 
@@ -489,7 +486,6 @@ phylo_plot
 
 ###### FloweringAxis Model #####
 Flowering<-trait %>% filter(Trait == "Flowering" & VALUE != "NoData")
-Flowering$Tree <- Flowering$Species.ssp.var 
 Flowering_drop<-trait %>% filter(Trait == "Flowering", VALUE == "NoData")
 Flowering_tree<-drop.tip(tree, Flowering_drop$Tree)
 labels<-data.frame(TipLabels(Flowering_tree)) 
@@ -603,7 +599,6 @@ phylo_plot
 
 ###### MeristemFunction Model #####
 MeristemFunction<-trait %>% filter(Trait == "MeristemFunctioning" & VALUE != "NoData")
-MeristemFunction$Tree <- MeristemFunction$Species.ssp.var
 MeristemFunction_drop<-trait %>% filter(Trait == "MeristemFunctioning", VALUE == "NoData")
 MeristemFunction_tree<-drop.tip(tree, MeristemFunction_drop$Tree)
 labels<-data.frame(TipLabels(MeristemFunction_tree)) 
@@ -717,7 +712,6 @@ phylo_plot
 
 ###### BranchingMechanism Model #####
 BranchingMechanism<-trait %>% filter(Trait == "BranchingMechanism" & VALUE != "NoData")
-BranchingMechanism$Tree <- BranchingMechanism$Species.ssp.var
 BranchingMechanism_drop<-trait %>% filter(Trait == "BranchingMechanism", VALUE == "NoData")
 BranchingMechanism_tree<-drop.tip(tree, BranchingMechanism_drop$Tree)
 labels<-data.frame(TipLabels(BranchingMechanism_tree)) 
@@ -831,7 +825,6 @@ phylo_plot
 
 ####### MAYBE REMOVE  ###### ShortShoots Model #####
 ShortShoots<-trait %>% filter(Trait == "ShortShoots" & VALUE != "NoData")
-ShortShoots$Tree <- ShortShoots$Species.ssp.var
 ShortShoots_drop<-trait %>% filter(Trait == "ShortShoots", VALUE == "NoData")
 ShortShoots_tree<-drop.tip(tree, ShortShoots_drop$Tree)
 labels<-data.frame(TipLabels(ShortShoots_tree))
@@ -942,6 +935,130 @@ phylo_plot<-ggplot(df_plot, aes(x=value*100,y=form,fill=variable)) +
   ggsci::scale_color_aaas(name="Direction")
 phylo_plot
 
+# CHECK BRANCHING AND REITERATION FOR INCLUSION
+
+###### Branching Model #####
+
+Branching<-trait %>% filter(Trait == "Branching" & VALUE != "NoData")
+Branching_drop<-trait %>% filter(Trait == "Branching", VALUE == "NoData")
+Branching_tree<-drop.tip(tree, Branching_drop$Tree)
+labels<-data.frame(TipLabels(Branching_tree))
+labels$Tree<-labels$TipLabels.Branching_tree.
+d<-dplyr::inner_join(labels, Branching)
+data<-d %>% filter(d$wild.cultivated == "Cultivated")
+
+#Prepare tree for model
+A <- ape::vcv.phylo(Branching_tree)
+B <-diag(diag(A + 0.00000000000000001)) #add to diagonal to make matrix positive definite.
+row.names(B)<-row.names(A)
+
+#Select only the cultivated crops, this is where the binary coding of changes lives in the data. Also seperate out and start with woody crops
+woody<-data %>% filter(wild.cultivated == "Cultivated" & Herbaceous.woody == "Woody")
+#set response for model
+woody$size <- with(woody,WR2toCrop+WR2toWR1+Both+Neither)
+woody$y <- with(woody, cbind(Neither,Both,WR2toCrop,WR2toWR1))
+#Run model
+
+woody_Branching <- brm(bf(y |trials(size) ~ 1 + (1|gr(Tree,cov=B))),
+                       family = multinomial(),
+                       data = data.frame(woody),
+                       data2 = list(B=B),
+                       chains = 4,
+                       thin = 5,
+                       iter = 3000,
+                       warmup = 500,
+                       sample_prior = TRUE,
+                       cores = 4)
+                       #control = list(adapt_delta = 0.9))
+print(woody_Branching)
+saveRDS(woody_Branching, file = "~/Dropbox/other_projects/crop_architecture/woody_Branching.RDS")
+
+# CORRECT, sample sizes way too small, only 4 transitions
+
+# woody_ShortShoots <- readRDS("../woody_ShortShoots.RDS")
+
+#Repeat steps above for herbaceous plans
+herb<-data %>% filter(wild.cultivated == "Cultivated" & Herbaceous.woody == "Herbaceous")
+herb$size <- with(herb,WR2toCrop+WR2toWR1+Both+Neither)
+herb$y <- with(herb, cbind(Neither,Both,WR2toCrop,WR2toWR1))
+
+herb_Branching <- brm(bf(y |trials(size) ~ 1 + (1|gr(Tree,cov=B))),
+                        family = multinomial(),
+                        data = data.frame(herb),
+                        data2 = list(B=B),
+                        chains = 4,
+                        thin = 5,
+                        iter = 3000,
+                        warmup = 500,
+                        sample_prior = TRUE,
+                        cores = 4)
+                        # control = list(adapt_delta = 0.9))
+print(herb_Branching)
+saveRDS(herb_Branching, file = "~/Dropbox/other_projects/crop_architecture/herb_Branching.RDS")
+
+# Herb is actually okay but since we can't do both, we'll leave it
+
+###### Reiteration Model #####
+
+Reiteration<-trait %>% filter(Trait == "Reiteration" & VALUE != "NoData")
+Reiteration_drop<-trait %>% filter(Trait == "Reiteration", VALUE == "NoData")
+Reiteration_tree<-drop.tip(tree, Reiteration_drop$Tree)
+labels<-data.frame(TipLabels(Reiteration_tree))
+labels$Tree<-labels$TipLabels.Reiteration_tree.
+d<-dplyr::inner_join(labels, Reiteration)
+data<-d %>% filter(d$wild.cultivated == "Cultivated")
+
+#Prepare tree for model
+A <- ape::vcv.phylo(Reiteration_tree)
+B <-diag(diag(A + 0.00000000000000001)) #add to diagonal to make matrix positive definite.
+row.names(B)<-row.names(A)
+
+#Select only the cultivated crops, this is where the binary coding of changes lives in the data. Also seperate out and start with woody crops
+woody<-data %>% filter(wild.cultivated == "Cultivated" & Herbaceous.woody == "Woody")
+#set response for model
+woody$size <- with(woody,WR2toCrop+WR2toWR1+Both+Neither)
+woody$y <- with(woody, cbind(Neither,Both,WR2toCrop,WR2toWR1))
+#Run model
+
+woody_Reiteration <- brm(bf(y |trials(size) ~ 1 + (1|gr(Tree,cov=B))),
+                       family = multinomial(),
+                       data = data.frame(woody),
+                       data2 = list(B=B),
+                       chains = 4,
+                       thin = 5,
+                       iter = 3000,
+                       warmup = 500,
+                       sample_prior = TRUE,
+                       cores = 4)
+#control = list(adapt_delta = 0.9))
+print(woody_Reiteration)
+saveRDS(woody_Reiteration, file = "~/Dropbox/other_projects/crop_architecture/woody_Reiteration.RDS")
+
+#Repeat steps above for herbaceous plans
+herb<-data %>% filter(wild.cultivated == "Cultivated" & Herbaceous.woody == "Herbaceous")
+herb$size <- with(herb,WR2toCrop+WR2toWR1+Both+Neither)
+herb$y <- with(herb, cbind(Neither,Both,WR2toCrop,WR2toWR1))
+
+herb_Reiteration <- brm(bf(y |trials(size) ~ 1 + (1|gr(Tree,cov=B))),
+                        family = multinomial(),
+                        data = data.frame(herb),
+                        data2 = list(B=B),
+                        chains = 4,
+                        thin = 5,
+                        iter = 3000,
+                        warmup = 500,
+                        sample_prior = TRUE,
+                        cores = 4,
+                        control = list(adapt_delta = 0.9))
+print(herb_Reiteration)
+saveRDS(herb_Reiteration, file = "~/Dropbox/other_projects/crop_architecture/herb_Reiteration.RDS")
+
+# ditto
+
+###### BasalBranching Model #####
+
+BasalBranching<-trait %>% filter(Trait == "BasalBranching" & VALUE != "NoData")
+# NO OBSERVATIONS WITHOUT NoData
 
 
 ###### Plotting Model ######
