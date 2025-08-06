@@ -1,5 +1,5 @@
 ﻿Crop,Herbaceous/woody,Pathway_Fuller,Pathway_Fuller_Cleaned
-Zizania_latifolia,Woody, Tuber (but young shoots are eaten), Tuber (but young shoots are eaten)
+Zizania_latifolia,Woody, Tuber (but young shoots are eaten),Tuber (but young shoots are eaten)
 Semecarpus_anacardium_,Herbaceous,Apparemently not cultivated other than as an ornemental - but medicinal -- get rid off,NA
 Cordyline_fruticosa_,Woody,Cultivated as an ornemental -- get rid off??,NA
 Panicum_virgatum,Herbaceous,Cultivated as an ornemental -- get rid off??,NA
@@ -146,7 +146,7 @@ Ananas_cosmosus_var._parguazensis_,Herbaceous,Fruit tree,Fruit tree
 Carissa_macrocarpa_,Herbaceous,Fruit tree,Fruit tree
 Malus_prunifolia,Herbaceous,Fruit tree,Fruit tree
 Morus_mongolica,Herbaceous,Fruit tree,Fruit tree
-Olea_europaea__,Herbaceous,Fruit tree,Fruit tree
+Olea_europaea,Herbaceous,Fruit tree,Fruit tree
 Opuntia_ficus-indica,Herbaceous,Fruit tree,Fruit tree
 Piper_guineense,Herbaceous,Fruit tree,Fruit tree
 Piper_longum,Herbaceous,Fruit tree,Fruit tree
@@ -460,7 +460,7 @@ Vigna_subterranea,Herbaceous,Grain,Grain
 Vigna_umbellata,Herbaceous,Grain,Grain
 Vigna_unguiculata,Herbaceous,Grain,Grain
 Vigna_unguiculata_subsp._unguiculata,Herbaceous,Grain,Grain
-Zea_mays_subsp._mays,Herbaceous,Grain,Grain
+Zea_mays,Herbaceous,Grain,Grain
 Zizania_palustris,Herbaceous,Grain,Grain
 Cyamopsis_tetragonoloba,Herbaceous,Grain,Grain
 Cenchrus_americanus,Woody,Grain,Grain
@@ -471,7 +471,7 @@ Triticum_turgidum_subsp._carthlicum,Woody,Grain,Grain
 Vigna_mungo,Herbaceous,Grain,Grain
 Guizotia_abyssinica_,Herbaceous,Grain,Grain
 Zizania_aquatica,Herbaceous,Grain,Grain
-Lathyrus_oleraceus__,Herbaceous,Grain,Grain
+Lathyrus_oleraceus,Herbaceous,Grain,Grain
 Lathyrus_sativus,Herbaceous,Grain,Grain
 Macrotyloma_uniflorum,Herbaceous,Grain,Grain
 Mesosphaerum_suaveolens_,Herbaceous,Grain,Grain
@@ -805,7 +805,7 @@ Pachyrhizus_tuberosus,Herbaceous,Tuber,Tuber
 Pastinaca_sativa,Herbaceous,Tuber,Tuber
 Plectranthus_esculentus_,Herbaceous,Tuber,Tuber
 Pueraria_montana,Herbaceous,Tuber,Tuber
-Raphanus_sativus__,Herbaceous,Tuber,Tuber
+Raphanus_sativus,Herbaceous,Tuber,Tuber
 Sagittaria_sagittifolia,Herbaceous,Tuber,Tuber
 Saussurea_costus_,Herbaceous,Tuber,Tuber
 Smallanthus_sonchifolius,Herbaceous,Tuber,Tuber

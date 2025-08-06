@@ -12,7 +12,7 @@ library(ggpp)
 library(ggplot2)
 
 ## Join  together cultivation data with age
-cultivation<-(read.csv(file = "~/Dropbox/other_projects/crop_architecture/crop_architecture/Data/20250211_LongFormat_croparchitecture_V3.csv", header=T)) %>% filter(wild.cultivated == "Cultivated")
+cultivation<-(read.csv(file = "~/Dropbox/other_projects/crop_architecture/crop_architecture/Data/20250727_LongFormat_croparchitecture_V4.csv", header=T)) %>% filter(wild.cultivated == "Cultivated")
 age<-read.csv(file = "~/Dropbox/other_projects/crop_architecture/crop_architecture/Data/milla_crop_origins_11march2020.csv", header=T)
 age$Species.ssp.var<-age$species_name_
 join<-inner_join(age,cultivation) %>% 
@@ -237,7 +237,7 @@ ggplot(aes(x = Trait, y = Variable, fill = Estimate)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) -> p  # Adjust the angle of x-axis labels for better visibility
 
-ggsave("~/Dropbox/other_projects/crop_architecture/figures/20250415_Fig_SX_climate_antiquity.svg", p, width = 8, height =4)
+ggsave("~/Dropbox/other_projects/crop_architecture/figures/20250730_Fig_SX_climate_antiquity_v2.svg", p, width = 8, height =4)
 
 ##### Plot of cultivation time 
 

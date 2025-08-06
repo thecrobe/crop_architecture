@@ -6,7 +6,7 @@ here::i_am("Code/phylo_prep_for_pgls.R")
 tree <- read.tree(here::here("Data/ALLMB.tre"))
 tree <- multi2di(tree)
 
-full.data <- read.csv(here::here("Data/20250211_LongFormat_croparchitecture_V3.csv"))
+full.data <- read.csv(here::here("Data/20250727_LongFormat_croparchitecture_V4.csv"))
 
 crops <- full.data[full.data$wild.cultivated == "Cultivated", ]
 
@@ -49,14 +49,13 @@ genera.not.in.phylo <- unique(crops$genus)[which(sapply(genera.in.phylo, length)
 ##                          )                                      
 
 genus.conv <- data.frame(not.phylo = genera.not.in.phylo,
-                         in.phylo = c("Bambusa", ## Synonym to Musa
-                                      "Chrysophyllum", ## Synonym to Gambeya
-                                      "Chaenomeles" ## Synonym to Pseudocydonia
+                         in.phylo = c("Bambusa", ## Synonym to Fimbribambusa
+                                      "Chrysophyllum" ## Synonym to Gambeya
                                       )
                          )
 
 tree$tip.label <- gsub("Bambusa_horsfieldii", "Fimbribambusa_horsfieldii", tree$tip.label)
-tree$tip.label <- gsub("Chaenomeles_sinensis", "Pseudocydonia_sinensis", tree$tip.label)
+# tree$tip.label <- gsub("Chaenomeles_sinensis", "Pseudocydonia_sinensis", tree$tip.label)
 tree$tip.label <- gsub("Chrysophyllum_africanum", "Gambeya_africana", tree$tip.label)
 tree$tip.label <- gsub("Chrysophyllum_beguei", "Gambeya_beguei", tree$tip.label)
 tree$tip.label <- gsub("Chrysophyllum_boukokoense", "Gambeya_boukokoensis", tree$tip.label)

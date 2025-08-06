@@ -12,7 +12,7 @@ library(TreeTools) #phylogeny
 
 ##### Import traits #####
 setwd("~/Dropbox/other_projects/crop_architecture/crop_architecture/")
-trait<-read.csv("Data/20250211_LongFormat_croparchitecture_V3.csv", header=T)
+trait<-read.csv("Data/20250727_LongFormat_croparchitecture_V4.csv", header=T)
 
 c<-trait %>% filter(wild.cultivated =="Cultivated")
 
@@ -141,7 +141,17 @@ phylo_plot<-ggplot(df_plot, aes(x=value*100,y=form,fill=variable)) +
   ggsci::scale_color_aaas(name="Direction")
 phylo_plot
 
+# summary
 
+herb_woody_cdiff <- data.frame(trait=rep("", 8),
+                               herb_p=rep(0., 8),
+                               woody_p=rep(0.,8)
+                               )
+
+herb_woody_cdiff$trait[1] <- "GrowthDirection"
+
+herb_woody_cdiff$herb_p[1] <- mean(dfm_herb[which(dfm_herb$variable == "Crop"),]$value)
+herb_woody_cdiff$woody_p[1] <- mean(dfm_woody[which(dfm_woody$variable == "Crop"),]$value)
 
 ###### Phyllotaxis Model #####
 Phyllotaxis<-trait %>% filter(Trait == "Phyllotaxis" & VALUE != "NoData")
@@ -255,6 +265,13 @@ phylo_plot<-ggplot(df_plot, aes(x=value*100,y=form,fill=variable)) +
   ggsci::scale_color_aaas(name="Direction")
 phylo_plot
 
+# summary 
+
+herb_woody_cdiff$trait[2] <- "Phyllotaxis"
+
+herb_woody_cdiff$herb_p[2] <- mean(dfm_herb[which(dfm_herb$variable == "Crop"),]$value)
+herb_woody_cdiff$woody_p[2] <- mean(dfm_woody[which(dfm_woody$variable == "Crop"),]$value)
+
 ###### BranchingType Model #####
 BranchingType<-trait %>% filter(Trait == "BranchingType" & VALUE != "NoData")
 BranchingType_drop<-trait %>% filter(Trait == "BranchingType", VALUE == "NoData")
@@ -366,6 +383,13 @@ phylo_plot<-ggplot(df_plot, aes(x=value*100,y=form,fill=variable)) +
   ggsci::scale_fill_aaas(name="Direction") + 
   ggsci::scale_color_aaas(name="Direction")
 phylo_plot
+
+# summary 
+
+herb_woody_cdiff$trait[3] <- "BranchingType"
+
+herb_woody_cdiff$herb_p[3] <- mean(dfm_herb[which(dfm_herb$variable == "Crop"),]$value)
+herb_woody_cdiff$woody_p[3] <- mean(dfm_woody[which(dfm_woody$variable == "Crop"),]$value)
 
 
 ###### BranchingPosition Model #####
@@ -483,6 +507,13 @@ phylo_plot<-ggplot(df_plot, aes(x=value*100,y=form,fill=variable)) +
   ggsci::scale_color_aaas(name="Direction")
 phylo_plot
 
+# summary 
+
+herb_woody_cdiff$trait[4] <- "BranchingPosition"
+
+herb_woody_cdiff$herb_p[4] <- mean(dfm_herb[which(dfm_herb$variable == "Crop"),]$value)
+herb_woody_cdiff$woody_p[4] <- mean(dfm_woody[which(dfm_woody$variable == "Crop"),]$value)
+
 
 ###### FloweringAxis Model #####
 Flowering<-trait %>% filter(Trait == "Flowering" & VALUE != "NoData")
@@ -597,6 +628,13 @@ phylo_plot<-ggplot(df_plot, aes(x=value*100,y=form,fill=variable)) +
   ggsci::scale_color_aaas(name="Direction")
 phylo_plot
 
+# summary 
+
+herb_woody_cdiff$trait[5] <- "FloweringAxis"
+
+herb_woody_cdiff$herb_p[5] <- mean(dfm_herb[which(dfm_herb$variable == "Crop"),]$value)
+herb_woody_cdiff$woody_p[5] <- mean(dfm_woody[which(dfm_woody$variable == "Crop"),]$value)
+
 ###### MeristemFunction Model #####
 MeristemFunction<-trait %>% filter(Trait == "MeristemFunctioning" & VALUE != "NoData")
 MeristemFunction_drop<-trait %>% filter(Trait == "MeristemFunctioning", VALUE == "NoData")
@@ -708,6 +746,13 @@ phylo_plot<-ggplot(df_plot, aes(x=value*100,y=form,fill=variable)) +
   ggsci::scale_fill_aaas(name="Direction") + 
   ggsci::scale_color_aaas(name="Direction")
 phylo_plot
+
+# summary 
+
+herb_woody_cdiff$trait[6] <- "MeristemFunction"
+
+herb_woody_cdiff$herb_p[6] <- mean(dfm_herb[which(dfm_herb$variable == "Crop"),]$value)
+herb_woody_cdiff$woody_p[6] <- mean(dfm_woody[which(dfm_woody$variable == "Crop"),]$value)
 
 
 ###### BranchingMechanism Model #####
@@ -822,6 +867,13 @@ phylo_plot<-ggplot(df_plot, aes(x=value*100,y=form,fill=variable)) +
   ggsci::scale_color_aaas(name="Direction")
 phylo_plot
 
+# summary 
+
+herb_woody_cdiff$trait[7] <- "BranchingMechanism"
+
+herb_woody_cdiff$herb_p[7] <- mean(dfm_herb[which(dfm_herb$variable == "Crop"),]$value)
+herb_woody_cdiff$woody_p[7] <- mean(dfm_woody[which(dfm_woody$variable == "Crop"),]$value)
+
 
 ####### MAYBE REMOVE  ###### ShortShoots Model #####
 ShortShoots<-trait %>% filter(Trait == "ShortShoots" & VALUE != "NoData")
@@ -934,6 +986,13 @@ phylo_plot<-ggplot(df_plot, aes(x=value*100,y=form,fill=variable)) +
   ggsci::scale_fill_aaas(name="Direction") +
   ggsci::scale_color_aaas(name="Direction")
 phylo_plot
+
+# summary 
+
+herb_woody_cdiff$trait[8] <- "ShortShoots"
+
+herb_woody_cdiff$herb_p[8] <- mean(dfm_herb[which(dfm_herb$variable == "Crop"),]$value)
+herb_woody_cdiff$woody_p[8] <- mean(dfm_woody[which(dfm_woody$variable == "Crop"),]$value)
 
 # CHECK BRANCHING AND REITERATION FOR INCLUSION
 
