@@ -1,12 +1,13 @@
 library("ape")
 library("readxl")
 library("stringr")
+library("dplyr")
 library("data.table")
 
 setwd("~/Dropbox/other_projects/crop_architecture/crop_architecture/")
 
 # load wide
-wide <- read_excel("Data/Microp_plant species_20-05-2022_GC_NWH.xlsx")
+wide <- read_excel("Data/Microp_plant species_20-05-2022_GC_NWH_20250727_GC_NWH.xlsx")
 
 # form long
 long <- melt(setDT(wide), id.vars = c(1:5), measure.vars = c(9:19),
@@ -21,17 +22,32 @@ long[, "Species.ssp.var" := gsub(" ", "_", Species.ssp.var)]
 # remove suffix from TRAIT column
 long[, "Trait" := gsub("_CLEAN", "", Trait)]
 
+# Make sure all common names have consistent formatting
+long[, Common.name := str_to_sentence(Common.name)]
+
+# 20250727 make sure all VALUE have consistent formatting
+long[, VALUE := str_to_sentence(VALUE)]
+
 # change NAs to 'NoData'
 long[is.na(get("VALUE")), ("VALUE"):="NoData"]
 
-# Make sure all common names have consistent formatting
-long[, Common.name := str_to_sentence(Common.name)]
+# 20250707 make sure all Wild/Cultivated are sentence case
+long[, Wild.cultivated := str_to_sentence(Wild.cultivated)]
 
 # remove trailing spaces on common names
 long[, Common.name := trimws(Common.name)]
 
+# 20250727 remove trailing whitespace on traits and values
+long[, Trait := trimws(Trait)]
+long[, VALUE := trimws(VALUE)]
+
+# for Wild/cultivated, we need to make them 'Wild' if field Common.name contains
+# 'wild relative'
+long[Wild.cultivated == "Wild/cultivated" & Common.name %flike% "wild relative", Wild.cultivated := "Wild"]
+long[Wild.cultivated == "Wild/cultivated", Wild.cultivated := "Cultivated"]
+
 # read in tree
-tree <- read.tree("Trees/tree_pgls_base_clean.tre")
+tree <- read.tree("Output/tree_pgls_base_clean.tre")
 
 # get tip labels
 tips.in.tree <- tree$tip.label
@@ -87,6 +103,16 @@ for (i in unique(long[Wild.cultivated == "Cultivated", Common.name])) {
   } 
 }
 
+# 20250727 figure out things with multiple wild relatives
+cultivated <- long[Wild.cultivated == "Cultivated"]
+for (i in cultivated$Common.name) {
+  sub <- long[Common.name %flike% paste(i, "wild relative")]
+  sub <- sub %>% group_by(Common.name)
+  wr <- str_sub(sub$Common.name, -1)
+  if ("3" %in% wr | "4" %in% wr) print(i)
+}
+# fix these ex situ
+
 # let's prepare columns to hold the change coding
 long$WR2toCrop <- rep(0, nrow(long))
 long$WR2toWR1 <- rep(0, nrow(long))
@@ -136,16 +162,16 @@ for (i in 1:nrow(long)) {
     cult.val <- long[i, VALUE]
     query1 <- paste(common, "wild relative 1")
     query2 <- paste(common, "wild relative 2")
-    # sometimes we have wild relative 2 and 3
-    if (nrow(long[Common.name == query1]) == 0) {
-      query1 <- paste(common, "wild relative 2")
-      query2 <- paste(common, "wild relative 3")
-    }
-    # sometimes we have wild relative 1 and 3
-    if (nrow(long[Common.name == query2]) == 0) {
-      query1 <- paste(common, "wild relative 1")
-      query2 <- paste(common, "wild relative 3")
-    }
+    # # sometimes we have wild relative 2 and 3
+    # if (nrow(long[Common.name == query1]) == 0) {
+    #   query1 <- paste(common, "wild relative 2")
+    #   query2 <- paste(common, "wild relative 3")
+    # }
+    # # sometimes we have wild relative 1 and 3
+    # if (nrow(long[Common.name == query2]) == 0) {
+    #   query1 <- paste(common, "wild relative 1")
+    #   query2 <- paste(common, "wild relative 3")
+    # }
     wr1.val <- long[Common.name == query1 & Trait == trait,
                     VALUE]
     wr2.val <- long[Common.name == query2 & Trait == trait,
@@ -176,5 +202,6 @@ colnames(long) <- c("Family", "Species.ssp.var", "common.name", "wild.cultivated
                     "Herbaceous.woody", "Trait", "VALUE", "WR2toCrop", "WR2toWR1",
                     "Both", "Neither", "Direction.WR2toCrop", "Direction.WR2toWR1")
 
-write.csv(long, "Data/20250211_LongFormat_croparchitecture_V3.csv", row.names = F)
+
+write.csv(long, "Data/20250727_LongFormat_croparchitecture_V4.csv", row.names = F)
 # unique(long[Trait == "GrowthDirection", VALUE])

@@ -7,7 +7,12 @@ library(ggpubr)
 library(tidyr)
 
 setwd("~/Dropbox/other_projects/crop_architecture/crop_architecture/")
-trait<-read.csv("Data/20250211_LongFormat_croparchitecture_V3.csv", header=T)
+trait<-read.csv("Data/20250727_LongFormat_croparchitecture_V4.csv", header=T)
+
+trait <- trait %>%
+  filter(Trait != "Branching") %>%
+  filter(Trait != "Reiteration") %>%
+  filter(Trait != "BasalBranching")
 
 c<-trait %>% filter(wild.cultivated =="Cultivated")
 
@@ -48,12 +53,12 @@ data <- data %>% filter(data$Both == 0)
 # collapse some states
 
 # Axis 1 Orthotropic -> Orthotropic
-data[which(data$CropState == "Axis 1 Orthotropic"),]$CropState <- "Orthotropic"
-data[which(data$WR1State == "Axis 1 Orthotropic"),]$WR1State <- "Orthotropic"
-data[which(data$WR2State == "Axis 1 Orthotropic"),]$WR2State <- "Orthotropic"
+data[which(data$CropState == "Axis 1 orthotropic"),]$CropState <- "Orthotropic"
+data[which(data$WR1State == "Axis 1 orthotropic"),]$WR1State <- "Orthotropic"
+data[which(data$WR2State == "Axis 1 orthotropic"),]$WR2State <- "Orthotropic"
 
 # Drop Orthotropic and Plagiotropic
-data <- data[-which(data$CropState == "Orthotropic and Plagiotropic"),]
+data <- data[-which(data$CropState == "Orthotropic and plagiotropic"),]
 
 tab1 <- table(data$CropState)
 tab1 <- tab1[2:length(tab1)]
@@ -68,7 +73,7 @@ chisq.test(merged, simulate.p.value = T)
 # Pearson's Chi-squared test with simulated p-value (based on 2000 replicates)
 # 
 # data:  merged
-# X-squared = 5.781, df = NA, p-value = 0.1189
+# X-squared = 4.1344, df = NA, p-value = 0.2494
 
 # 
 # # do posthoc OR CI
@@ -127,7 +132,7 @@ chisq.test(merged, simulate.p.value = T)
 # Pearson's Chi-squared test with simulated p-value (based on 2000 replicates)
 # 
 # data:  merged
-# X-squared = 6.619, df = NA, p-value = 0.2884
+# X-squared = 3.0144, df = NA, p-value = 0.7546
 
 tmp <- data.frame(trait = rep("Phyllotaxis", 2*ncol(merged)),
                   transition = c(rep("Crop", ncol(merged)), rep("Wild", ncol(merged))),
@@ -154,12 +159,12 @@ data <- data %>% filter(data$Both == 0)
 # collapse some states
 
 # Axis 1 Monopodial -> Monopodial
-data[which(data$CropState == "Axis 1 Monopodial"),]$CropState <- "Monopodial"
-data[which(data$WR1State == "Axis 1 Monopodial"),]$WR1State <- "Monopodial"
+data[which(data$CropState == "Axis 1 monopodial"),]$CropState <- "Monopodial"
+data[which(data$WR1State == "Axis 1 monopodial"),]$WR1State <- "Monopodial"
 # data[which(data$WR2State == "Axis 1 Monopodial"),]$WR2State <- "Monopodial"
 
-# drop Monopodial or Sympodial
-data <- data[-which(data$CropState == "Monopodial or Sympodial"),]
+# drop Monopodial or sympodial present only in single crop 
+data <- data[-which(data$CropState == "Monopodial or sympodial"),]
 
 tab1 <- table(data$CropState)
 tab1 <- tab1[2:length(tab1)]
@@ -171,15 +176,15 @@ rownames(merged) <- c("Crop", "Wild")
 merged[is.na(merged)] <- 0
 chisq.test(merged, simulate.p.value = T)
 
-# Pearson's Chi-squared test with simulated p-value (based on 2000 replicates)
+# 	Pearson's Chi-squared test with simulated p-value (based on 2000 replicates)
 # 
 # data:  merged
-# X-squared = 11.927, df = NA, p-value = 0.01299
+# X-squared = 12.718, df = NA, p-value = 0.009495
 
 round(residuals(chisq.test(merged, simulate.p.value = T)), 3)
-#       Absent Axis 1 Monopodial Axis 2 Sympodial Monopodial and Sympodial Monopodial Sympodial
-# Crop  1.354                             -0.012                   -1.160     -0.719    -0.461
-# Wild -1.940                              0.017                    1.661      1.030     0.660
+#      Absent Axis 1 monopodial axis 2 sympodial Monopodial and sympodial Monopodial Sympodial
+# Crop  1.303                             -0.059                   -1.179     -0.819    -0.344
+# Wild -1.967                              0.089                    1.779      1.235     0.519
 
 tmp <- data.frame(trait = rep("BranchingType", 2*ncol(merged)),
                   transition = c(rep("Crop", ncol(merged)), rep("Wild", ncol(merged))),
@@ -213,13 +218,14 @@ rownames(merged) <- c("Crop", "Wild")
 merged[is.na(merged)] <- 0
 chisq.test(merged, simulate.p.value = T)
 # Pearson's Chi-squared test with simulated p-value (based on 2000 replicates)
-# 
+
 # data:  merged
-# X-squared = 12.13, df = NA, p-value = 0.02699
+# X-squared = 12.84, df = NA, p-value = 0.01999
 round(residuals(chisq.test(merged, simulate.p.value = T)), 3)
-#       Absent Acrotonic Acrotonic and Basitonic Basitonic Basitonic and Mesotonic Mesotonic
-# Crop  1.129     1.390                  -0.348    -0.725                   0.390    -0.954
-# Wild -1.368    -1.684                   0.421     0.878                  -0.473     1.156
+#      Absent Acrotonic Acrotonic and basitonic Basitonic Basitonic and mesotonic Mesotonic
+# Crop  1.359     1.203                  -0.324    -0.667                   0.440    -1.121
+# Wild -1.623    -1.436                   0.386     0.796                  -0.525     1.339
+
 
 tmp <- data.frame(trait = rep("BranchingPosition", 2*ncol(merged)),
                   transition = c(rep("Crop", ncol(merged)), rep("Wild", ncol(merged))),
@@ -245,6 +251,8 @@ data <- data %>% filter(data$Both == 0)
 
 # drop Absent only present in a single crop
 data <- data[-which(data$CropState == "Absent"),]
+# drop Lateral or terminal only present in a single crop
+data <- data[-which(data$CropState == "Lateral or terminal"),]
 
 
 tab1 <- table(data$CropState)
@@ -257,10 +265,10 @@ rownames(merged) <- c("Crop", "Wild")
 merged[is.na(merged)] <- 0
 chisq.test(merged, simulate.p.value = T)
 
-# Pearson's Chi-squared test with simulated p-value (based on 2000 replicates)
+# 	Pearson's Chi-squared test with simulated p-value (based on 2000 replicates)
 # 
 # data:  merged
-# X-squared = 3.5638, df = NA, p-value = 0.2964
+# X-squared = 2.2915, df = NA, p-value = 0.3268
 
 tmp <- data.frame(trait = rep("FloweringAxis", 2*ncol(merged)),
                   transition = c(rep("Crop", ncol(merged)), rep("Wild", ncol(merged))),
@@ -285,10 +293,10 @@ table(data$WR1State)
 # now we need to extract the relevant transitions
 data <- data %>% filter(data$Both == 0)
 
-# drop Axis 1 Indeterminate only present in a single crop
-data <- data[-which(data$CropState == "Axis 1 Indeterminate"),]
+# switch Axis 1 Indeterminate only present in a single crop
+data[which(data$CropState == "Axis 1 indeterminate"),]$CropState <- "Indeterminate"
 # drop Determinate or Indeterminate only present in a single crop
-data <- data[-which(data$CropState == "Determinate or Indeterminate"),]
+data <- data[-which(data$CropState == "Determinate or indeterminate"),]
 
 tab1 <- table(data$CropState)
 tab1 <- tab1[2:length(tab1)]
@@ -301,9 +309,10 @@ merged[is.na(merged)] <- 0
 chisq.test(merged, simulate.p.value = T)
 
 # Pearson's Chi-squared test with simulated p-value (based on 2000 replicates)
-# 
+
+
 # data:  merged
-# X-squared = 1.4961, df = NA, p-value = 0.3108
+# X-squared = 1.44, df = NA, p-value = 0.3143
 
 tmp <- data.frame(trait = rep("MeristemFunctioning", 2*ncol(merged)),
                   transition = c(rep("Crop", ncol(merged)), rep("Wild", ncol(merged))),
@@ -341,7 +350,7 @@ chisq.test(merged, simulate.p.value = T)
 # Pearson's Chi-squared test with simulated p-value (based on 2000 replicates)
 # 
 # data:  merged
-# X-squared = 2.0449, df = NA, p-value = 0.6257
+# X-squared = 3.0574, df = NA, p-value = 0.3943
 
 tmp <- data.frame(trait = rep("BranchingMechanism", 2*ncol(merged)),
                   transition = c(rep("Crop", ncol(merged)), rep("Wild", ncol(merged))),
@@ -378,7 +387,7 @@ chisq.test(merged, simulate.p.value = T)
 # Pearson's Chi-squared test with simulated p-value (based on 2000 replicates)
 # 
 # data:  merged
-# X-squared = 0.12454, df = NA, p-value = 1
+# X-squared = 0.35822, df = NA, p-value = 0.7151
 
 tmp <- data.frame(trait = rep("ShortShoots", 2*ncol(merged)),
                   transition = c(rep("Crop", ncol(merged)), rep("Wild", ncol(merged))),
