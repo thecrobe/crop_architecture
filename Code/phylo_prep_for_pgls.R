@@ -9,7 +9,7 @@ here::i_am("Code/phylo_prep_for_pgls.R")
 tree <- read.tree(here::here("Data/ALLMB.tre"))
 tree <- multi2di(tree)
 
-full.data <- read.csv(here::here("Data/20250211_LongFormat_croparchitecture_V3.csv"))
+full.data <- read.csv(here::here("Data/20250727_LongFormat_croparchitecture_V4.csv"))
 
 crops <- full.data[full.data$wild.cultivated == "Cultivated", ]
 
