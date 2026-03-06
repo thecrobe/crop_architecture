@@ -2,24 +2,19 @@
 library(ggplot2) #plotting
 library(dplyr)#data wrangling 
 library(reshape2) #data wrangling
-library(brms) #modeling
-library(ggbreak) #plotting
 library(ggsci) #plotting
 library(ggpubr) #plots
-library(tidybayes) #plotting
-library(ape) #phylogeny
-library(TreeTools) #phylogeny
 library(rcartocolor)
 library(taxize)
 
 ##### Import traits #####
-form<-read.csv("~/Dropbox/other_projects/crop_architecture/crop_architecture/Data/Crop_Form_Fullman.csv", header=T) %>% na.omit()
+form<-read.csv("Data/Crop_Form_Fullman.csv", header=T) %>% na.omit()
 form$Crop <- gsub("_$", "", form$Crop)
 form$Crop <- gsub("__$", "", form$Crop)
 form$Crop <- gsub("_x_", "_", form$Crop)
 form$Crop <- gsub("_×_", "_", form$Crop)
 form$Crop <- gsub("__", "_", form$Crop)
-trait<-read.csv("~/Dropbox/other_projects/crop_architecture/crop_architecture/Data/20250211_LongFormat_croparchitecture_V3.csv", header=T)
+trait<-read.csv("Data/20250727_LongFormat_croparchitecture_V4.csv", header=T)
 trait<-trait %>%
   mutate(Herbaceous.woody = case_when(
     Herbaceous.woody == "Graminoid" ~ "Herbaceous",
@@ -91,6 +86,12 @@ form[which(form$Pathway_Fuller_Cleaned == "Tuber (but young shoots are eaten)"),
 
 table(form$Pathway_Fuller_Cleaned)
 
+pathway_fuller_cleaned_df <- data.frame(Crop=form$Crop,
+                                        `Woody / Herbaceous` = form$Herbaceous.woody,
+                                        Pathway_Fuller_Cleaned = form$Pathway_Fuller_Cleaned)
+
+# write.csv(x = pathway_fuller_cleaned_df, file = "Data/20260305_Crop_Form_Fullman_Cleaned.csv", quote = F, row.names = F)
+
 # get traits dataset for species in form database
 trait <- trait[trait$Species.ssp.var %in% form$Crop,] %>%
   filter(Trait != "Branching") %>%
@@ -138,7 +139,8 @@ p <- ggplot(data=df, aes(x=Transitions, fill=Pathway, y=Freq)) +
   xlab("Transitions") +
   theme_bw()
 
-ggsave("~/Dropbox/other_projects/crop_architecture/figures/FigX_pathway_by_trait_v4.svg", p, width = 7, height = 9)
+ggsave("../figures/FigX_pathway_by_trait_v5.svg", p, width = 7, height = 9,
+       device = svg)
 
 tests <- data.frame(trait=levels(df$Trait),
                     p=rep(0., 8))

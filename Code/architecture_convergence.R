@@ -6,7 +6,6 @@ library(ggsci)
 library(ggpubr)
 library(tidyr)
 
-setwd("~/Dropbox/other_projects/crop_architecture/crop_architecture/")
 trait<-read.csv("Data/20250727_LongFormat_croparchitecture_V4.csv", header=T)
 
 trait <- trait %>%
